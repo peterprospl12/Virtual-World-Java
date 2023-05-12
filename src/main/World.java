@@ -1,4 +1,5 @@
 package main;
+import Organisms.Animals.*;
 import Organisms.Organism;
 
 import java.util.Vector;
@@ -21,6 +22,45 @@ public class World {
     private void sortOrganisms() {
 
     }
+
+    public void performTurn() {
+
+        this.addOrganism(new Human(15, 15, this));
+        this.addOrganism(new Sheep(13, 1, this));
+        this.addOrganism(new Turtle(5, 5, this));
+        this.addOrganism(new Fox(15, 9, this));
+
+        this.drawWorld();
+
+        while (humanAlive) {
+            this.sortOrganisms();
+            for (int i = 0; i < organisms.size(); i++) {
+                if (!humanAlive)
+                {
+                    break;
+                }
+
+                if (gameSaved) {
+                    continue;
+                }
+
+                Organism currOrg = organisms.get(i);
+                if (currOrg.getAge() > 0) {
+                    currOrg.action();
+                    currOrg.incrementAge();
+                }
+                else
+                {
+                    currOrg.incrementAge();
+                }
+            }
+            gameSaved = false;
+        }
+        this.drawWorld();
+    }
+
+
+
 
     public void drawWorld() {
         //system("cls");
@@ -46,4 +86,27 @@ public class World {
         }
     }
 
+    public void addOrganism(Organism organism) {
+        if(organism instanceof Human) {
+            humanAlive = true;
+        }
+        organisms.add(organism);
+        board[organism.getPosY()][organism.getPosX()] = organism;
+    }
+
+    public int getBoardSizeX() {
+        return boardSizeX;
+    }
+
+    public int getBoardSizeY() {
+        return boardSizeY;
+    }
+
+    public Organism getOrganism(int x, int y) {
+        return board[y][x];
+    }
+
+    public void setOrganism(Organism organism, int x, int y) {
+        board[y][x] = organism;
+    }
 }

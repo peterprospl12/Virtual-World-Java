@@ -2,6 +2,7 @@ package Organisms.Animals;
 
 import Organisms.Organism;
 import main.World;
+import java.util.Random;
 public abstract class Animal extends Organism {
 
     public Animal(int strength, int initiative, int posX, int posY, char prefix, String name, World currWorld){
@@ -9,19 +10,50 @@ public abstract class Animal extends Organism {
     }
     @Override
     public void action() {
-        int newX, newY;
+        int[] newPos = {posX, posY};
         // dodac infostreama
-
-
+        System.out.println("Use arrow ");
+        this.makeMove(newPos);
+        this.setNewPosition(newPos[0], newPos[1]);
     }
 
     @Override
-    public void collision(Organism invader) {
+    public boolean collision(Organism invader) {
+        return true;
+    }
 
+    @Override
+    public void makeMove(int[] newPos) {
+        int newX = newPos[0];
+        int newY = newPos[1];
+
+        int[][] moves = { {0,-1}, {0,1}, {-1,0}, {1,0}, {-1,-1}, {1,-1}, {-1,1}, {1,1} };
+        Random rand = new Random();
+        int tryCounter = 0;
+
+        while(tryCounter < 40){
+            tryCounter++;
+            int rand_number = rand.nextInt(8);
+
+            int dx = moves[rand_number][0];
+            int dy = moves[rand_number][1];
+
+            if (newX + dx >= 0 && newX + dx < currWorld.getBoardSizeX() &&
+                    newY + dy >= 0 && newY + dy < currWorld.getBoardSizeY()) {
+                newX += dx;
+                newY += dy;
+
+                if (newX != posX || newY != posY) {
+                    newPos[0] = newX;
+                    newPos[1] = newY;
+                    break;
+                }
+            }
+        }
     }
 
     public boolean checkMultiply(Animal defender){
-
+        return true;
     }
 
     abstract Animal clone(int clonePosX, int clonePosY);
