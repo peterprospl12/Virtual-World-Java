@@ -19,6 +19,7 @@ public class Human extends Animal{
         super(HUMAN_STRENGTH, HUMAN_INITIATIVE, posX, posY, 'H', "Human", currWorld);
     }
 
+    @Override
     public void makeMove(int[] newPos) {
         int newX = newPos[0];
         int newY = newPos[1];

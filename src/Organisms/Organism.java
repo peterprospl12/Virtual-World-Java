@@ -1,6 +1,7 @@
 package Organisms;
 import main.World;
 public abstract class Organism {
+    public static final String images_path = "images/";
     protected int strength;
     protected int initiative;
     protected int posX;
@@ -60,9 +61,18 @@ public abstract class Organism {
         return age;
     }
 
+    public int getInitiative() {
+        return initiative;
+    }
+
     public void incrementAge() {
         this.age++;
     }
+
+    public String getImagePath() {
+        return IconsPath.valueOf(name.toUpperCase()).getPath();
+    }
+
 
     public void setNewPosition(int newX, int newY) {
         currWorld.setOrganism(null, this.posX, this.posY);

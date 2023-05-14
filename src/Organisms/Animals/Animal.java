@@ -12,20 +12,88 @@ public abstract class Animal extends Organism {
     public void action() {
         int[] newPos = {posX, posY};
         // dodac infostreama
-        System.out.println("Use arrow ");
+
         this.makeMove(newPos);
-        this.setNewPosition(newPos[0], newPos[1]);
+
+        if(newPos[0] == posX && newPos[1] == posY){
+            return;
+        }
+
+        if(currWorld.getOrganism(newPos[0], newPos[1]) != null){
+           Organism defender = currWorld.getOrganism(newPos[0], newPos[1]);
+
+           if(defender instanceof Animal){
+               if(this.checkMultiply((Animal) defender)){
+                   return;
+               }
+           }
+
+           if(defender.collision(this)) {
+               return;
+           }
+
+           if(defender.hasBlocked(this)) {
+               //dodac info streama
+               currWorld.removeOrganism(this);
+           }
+           else{
+               //dodac infostreama
+               currWorld.removeOrganism(currWorld.getOrganism(newPos[0], newPos[1]));
+               this.setNewPosition(newPos[0], newPos[1]);
+           }
+
+
+        }
+        else {
+            //dodac infostreama
+            this.setNewPosition(newPos[0], newPos[1]);
+        }
+    }
+
+    public boolean checkMultiply(Animal defender){
+        if(defender == null) {
+            return false;
+        }
+
+        if(this.getClass().equals(defender.getClass())){
+            int[] newPos = {posX, posY};
+            int tryCounter = 0;
+            Random rand = new Random();
+            do {
+                int rand_number = rand.nextInt(2) + 1;
+
+                if(rand_number == 1){
+                    this.makeMove(newPos);
+                }
+                else{
+                    defender.makeMove(newPos);
+                }
+                tryCounter++;
+            } while( currWorld.getOrganism(newPos[0], newPos[1]) != null && tryCounter < 40);
+
+            if(tryCounter >= 40) {
+                return false;
+            }
+
+            Animal kid = this.clone(newPos[0], newPos[1]);
+            currWorld.addOrganism(kid);
+            // infostream
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     @Override
     public boolean collision(Organism invader) {
-        return true;
+        return false;
     }
 
     @Override
     public void makeMove(int[] newPos) {
-        int newX = newPos[0];
-        int newY = newPos[1];
+        int newX = posX;
+        int newY = posY;
 
         int[][] moves = { {0,-1}, {0,1}, {-1,0}, {1,0}, {-1,-1}, {1,-1}, {-1,1}, {1,1} };
         Random rand = new Random();
@@ -52,9 +120,7 @@ public abstract class Animal extends Organism {
         }
     }
 
-    public boolean checkMultiply(Animal defender){
-        return true;
-    }
+
 
     abstract Animal clone(int clonePosX, int clonePosY);
 }

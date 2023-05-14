@@ -1,6 +1,10 @@
 package main;
 import Organisms.Animals.*;
 import Organisms.Organism;
+import Organisms.Plants.Dandelion;
+import Organisms.Plants.Grass;
+import Organisms.Plants.Guarana;
+import Organisms.Plants.PineBorscht;
 
 import java.util.Vector;
 public class World {
@@ -18,20 +22,48 @@ public class World {
         this.organisms = new Vector<Organism>();
         this.humanAlive = false;
         this.gameSaved = false;
+        this.createWindow();
     }
     private void sortOrganisms() {
+        int size = organisms.size();
 
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size - 1; j++) {
+                if (organisms.get(j).getInitiative() < organisms.get(j + 1).getInitiative()) {
+                    swap(organisms, j, j + 1);
+                }
+			else if (organisms.get(j).getInitiative() == organisms.get(j + 1).getInitiative()) {
+                    if (organisms.get(j).getAge() < organisms.get(j + 1).getAge()) {
+                        swap(organisms, j, j + 1);
+                    }
+                }
+            }
+        }
+    }
+
+    private void createWindow() {
+        GUI gui = new GUI(this);
+    }
+
+    public void changeBoardSize() {
+        this.board = new Organism[boardSizeY][boardSizeX];
     }
 
     public void performTurn() {
-
         this.addOrganism(new Human(15, 15, this));
         this.addOrganism(new Sheep(13, 1, this));
-        this.addOrganism(new Turtle(5, 5, this));
-        this.addOrganism(new Fox(15, 9, this));
+        this.addOrganism(new Sheep(5, 5, this));
+        this.addOrganism(new Sheep(15, 9, this));
+        this.addOrganism(new Sheep(1, 3, this));
+        this.addOrganism(new Sheep(12, 12, this));
+        this.addOrganism(new Sheep(4, 8, this));
+        this.addOrganism(new Sheep(5, 0, this));
+        this.addOrganism(new Sheep(11, 0, this));
+        this.addOrganism(new Wolf(3, 17, this));
+
 
         this.drawWorld();
-
+        /*
         while (humanAlive) {
             this.sortOrganisms();
             for (int i = 0; i < organisms.size(); i++) {
@@ -57,6 +89,8 @@ public class World {
             gameSaved = false;
         }
         this.drawWorld();
+        */
+
     }
 
 
@@ -94,6 +128,17 @@ public class World {
         board[organism.getPosY()][organism.getPosX()] = organism;
     }
 
+    public void removeOrganism(Organism organism) {
+        if(organism instanceof Human) {
+            humanAlive = false;
+        }
+
+        if (organisms.contains(organism)) {
+            organisms.remove(organism);
+            board[organism.getPosY()][organism.getPosX()] = null;
+        }
+    }
+
     public int getBoardSizeX() {
         return boardSizeX;
     }
@@ -109,4 +154,18 @@ public class World {
     public void setOrganism(Organism organism, int x, int y) {
         board[y][x] = organism;
     }
+
+    public void setBoardSizeX(int boardSizeX) {
+        this.boardSizeX = boardSizeX;
+    }
+
+    public void setBoardSizeY(int boardSizeY) {
+        this.boardSizeY = boardSizeY;
+    }
+    public static <T> void swap(Vector<T> vector, int index1, int index2) {
+        T tmp = vector.get(index1);
+        vector.set(index1, vector.get(index2));
+        vector.set(index2, tmp);
+    }
+
 }
