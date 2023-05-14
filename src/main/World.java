@@ -49,22 +49,13 @@ public class World {
         this.board = new Organism[boardSizeY][boardSizeX];
     }
 
-    public void performTurn() {
-        this.addOrganism(new Human(15, 15, this));
-        this.addOrganism(new Sheep(13, 1, this));
-        this.addOrganism(new Sheep(5, 5, this));
-        this.addOrganism(new Sheep(15, 9, this));
-        this.addOrganism(new Sheep(1, 3, this));
-        this.addOrganism(new Sheep(12, 12, this));
-        this.addOrganism(new Sheep(4, 8, this));
-        this.addOrganism(new Sheep(5, 0, this));
-        this.addOrganism(new Sheep(11, 0, this));
-        this.addOrganism(new Wolf(3, 17, this));
+    public boolean performTurn() {
+
 
 
         this.drawWorld();
-        /*
-        while (humanAlive) {
+
+        if (humanAlive) {
             this.sortOrganisms();
             for (int i = 0; i < organisms.size(); i++) {
                 if (!humanAlive)
@@ -87,9 +78,10 @@ public class World {
                 }
             }
             gameSaved = false;
+            this.drawWorld();
+            return true;
         }
-        this.drawWorld();
-        */
+        return false;
 
     }
 
@@ -161,6 +153,9 @@ public class World {
 
     public void setBoardSizeY(int boardSizeY) {
         this.boardSizeY = boardSizeY;
+    }
+    public void clearOrganisms() {
+        this.organisms.clear();
     }
     public static <T> void swap(Vector<T> vector, int index1, int index2) {
         T tmp = vector.get(index1);

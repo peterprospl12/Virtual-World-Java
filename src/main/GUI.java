@@ -93,7 +93,7 @@ public class GUI {
             world.changeBoardSize();
             frame.getContentPane().removeAll();
             frame.repaint();
-            this.game();
+            this.fillBoard();
         });
 
         back.addActionListener(e -> {
@@ -163,14 +163,13 @@ public class GUI {
 
 
 
-    private void game() {
+    private void fillBoard() {
         int[] buttonNumber = {0};
         OrganismFactory organismFactory = new OrganismFactory();
-        world.performTurn();
         JPanel boardPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
-        JPanel buttonPanel = new JPanel(new GridLayout(10, 1));
+        JPanel buttonPanel = new JPanel(new GridLayout(NUMBER_OF_ORGANISMS+2, 1));
         int cell_size = (int) Math.min(
                 (frame.getContentPane().getWidth()*0.75) / world.getBoardSizeX(),
                 frame.getContentPane().getHeight() / world.getBoardSizeY()
@@ -223,6 +222,25 @@ public class GUI {
             });
         }
 
+        JButton gameStart = new JButton("Start game");
+        gameStart.addActionListener(e -> {
+            frame.getContentPane().removeAll();
+            frame.repaint();
+            this.game();
+
+        });
+        buttonPanel.add(gameStart);
+
+        JButton goBack = new JButton("Back");
+        goBack.addActionListener(e -> {
+            frame.getContentPane().removeAll();
+            frame.repaint();
+            world.clearOrganisms();
+            this.newGameMenu();
+
+        });
+        buttonPanel.add(goBack);
+
         Dimension buttonPanelPreferredSize = new Dimension(cell_size, cell_size);
         buttonPanel.setPreferredSize(buttonPanelPreferredSize);
         buttonPanel.setMinimumSize(buttonPanelPreferredSize);
@@ -235,6 +253,59 @@ public class GUI {
         frame.setContentPane(splitPane);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setVisible(true);
+    }
+
+
+    private void game() {
+        OrganismFactory organismFactory = new OrganismFactory();
+        JPanel boardPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        int cell_size = (int) Math.min(
+                (frame.getContentPane().getWidth()) / world.getBoardSizeX(),
+                frame.getContentPane().getHeight() / world.getBoardSizeY()
+        );
+
+
+
+        Dimension cellPanelPreferredSize = new Dimension(cell_size, cell_size);
+            frame.getContentPane().removeAll();
+            frame.repaint();
+            for (int y = 0; y < world.getBoardSizeY(); y++) {
+                for (int x = 0; x < world.getBoardSizeX(); x++) {
+                    JPanel cellPanel = new JPanel();
+                    cellPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+                    if (world.getOrganism(x, y) != null) {
+                        ImageIcon icon = new ImageIcon(world.getOrganism(x, y).getImagePath());
+                        Image image = icon.getImage();
+                        Image newImage = image.getScaledInstance(cell_size, cell_size, Image.SCALE_SMOOTH);
+                        icon = new ImageIcon(newImage);
+                        JLabel label = new JLabel(icon);
+                        cellPanel.removeAll();
+                        cellPanel.add(label);
+                        cellPanel.revalidate();
+                        cellPanel.repaint();
+
+                        //cellPanel.setBackground(Color.BLACK);
+                    } else {
+                        cellPanel.setBackground(Color.WHITE);
+                    }
+                    cellPanel.setPreferredSize(cellPanelPreferredSize);
+                    cellPanel.setMinimumSize(cellPanelPreferredSize);
+
+                    c.gridx = x;
+                    c.gridy = y;
+
+                    boardPanel.add(cellPanel, c);
+                }
+            }
+
+
+            frame.setContentPane(boardPanel);
+            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            frame.setVisible(true);
+
     }
 
 
