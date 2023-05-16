@@ -32,7 +32,7 @@ public class Turtle extends Animal{
     @Override
     public boolean collision(Organism attacker) {
         if(attacker.getStrength() < 5) {
-            // dodac infostreama
+            currWorld.addToInfoStream(this.getOrganismInfo() + " has defended itself from " + attacker.getOrganismInfo() + " attack! \n");
             return true;
         }
         else {

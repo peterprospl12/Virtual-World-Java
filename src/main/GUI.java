@@ -1,6 +1,11 @@
 package main;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import Organisms.OrganismFactory;
@@ -13,9 +18,12 @@ public class GUI {
     private JPanel panel;
     private JTextArea textArea;
     private JScrollPane scrollPane;
+    private JPanel[][] cellPanels;
+    private JPanel boardPanel;
     private World world;
     private int screenSizeX;
     private int screenSizeY;
+    private int cell_size;
     public GUI(World world) {
         this.world = world;
         this.screenSizeX = Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -165,12 +173,13 @@ public class GUI {
 
     private void fillBoard() {
         int[] buttonNumber = {0};
+        cellPanels = new JPanel[world.getBoardSizeY()][world.getBoardSizeX()];
         OrganismFactory organismFactory = new OrganismFactory();
-        JPanel boardPanel = new JPanel(new GridBagLayout());
+        boardPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         JPanel buttonPanel = new JPanel(new GridLayout(NUMBER_OF_ORGANISMS+2, 1));
-        int cell_size = (int) Math.min(
+        cell_size = (int) Math.min(
                 (frame.getContentPane().getWidth()*0.75) / world.getBoardSizeX(),
                 frame.getContentPane().getHeight() / world.getBoardSizeY()
         );
@@ -208,6 +217,7 @@ public class GUI {
                 c.gridy = y;
 
                 boardPanel.add(cellPanel, c);
+                cellPanels[y][x] = cellPanel;
             }
         }
 
@@ -258,64 +268,131 @@ public class GUI {
 
     private void game() {
         OrganismFactory organismFactory = new OrganismFactory();
-        JPanel boardPanel = new JPanel(new GridBagLayout());
+        Dimension cellPanelPreferredSize = new Dimension(cell_size, cell_size);
+        boardPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
-        int cell_size = (int) Math.min(
-                (frame.getContentPane().getWidth()) / world.getBoardSizeX(),
-                frame.getContentPane().getHeight() / world.getBoardSizeY()
-        );
+        for (int y = 0; y < world.getBoardSizeY(); y++) {
+            for (int x = 0; x < world.getBoardSizeX(); x++) {
+                JPanel cellPanel = new JPanel();
+                cellPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                cellPanel.setPreferredSize(cellPanelPreferredSize);
+                cellPanel.setMinimumSize(cellPanelPreferredSize);
 
+                c.gridx = x;
+                c.gridy = y;
 
-
-        Dimension cellPanelPreferredSize = new Dimension(cell_size, cell_size);
-            frame.getContentPane().removeAll();
-            frame.repaint();
-            for (int y = 0; y < world.getBoardSizeY(); y++) {
-                for (int x = 0; x < world.getBoardSizeX(); x++) {
-                    JPanel cellPanel = new JPanel();
-                    cellPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
-                    if (world.getOrganism(x, y) != null) {
-                        ImageIcon icon = new ImageIcon(world.getOrganism(x, y).getImagePath());
-                        Image image = icon.getImage();
-                        Image newImage = image.getScaledInstance(cell_size, cell_size, Image.SCALE_SMOOTH);
-                        icon = new ImageIcon(newImage);
-                        JLabel label = new JLabel(icon);
-                        cellPanel.removeAll();
-                        cellPanel.add(label);
-                        cellPanel.revalidate();
-                        cellPanel.repaint();
-
-                        //cellPanel.setBackground(Color.BLACK);
-                    } else {
-                        cellPanel.setBackground(Color.WHITE);
-                    }
-                    cellPanel.setPreferredSize(cellPanelPreferredSize);
-                    cellPanel.setMinimumSize(cellPanelPreferredSize);
-
-                    c.gridx = x;
-                    c.gridy = y;
-
-                    boardPanel.add(cellPanel, c);
-                }
+                boardPanel.add(cellPanel, c);
+                cellPanels[y][x] = cellPanel;
             }
+        }
+        GUIKeyListener guiKeyListener = new GUIKeyListener(frame);
+
+        //button to save
+        JButton save = new JButton("Save");
+        save.addActionListener(e -> {
+            //Podaj nazwe pliku
+            String fileName = JOptionPane.showInputDialog("Enter file name");
+            world.saveWorld(fileName);
 
 
-            frame.setContentPane(boardPanel);
-            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-            frame.setVisible(true);
+        });
+        boardPanel.add(save);
 
+
+        // textarea
+
+        JPanel textPanel = new JPanel(new GridBagLayout());
+        textPanel.setPreferredSize(new Dimension(500, 500));
+
+        // Ustawienie textarea w prawym panelu
+        JTextPane textArea = new JTextPane();
+        textArea.setEditable(false);
+        textArea.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frame.requestFocusInWindow(); // Przejęcie żądania focusu
+            }
+        });
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(300, 500)); // Preferowane wymiary JScrollPane
+        scrollPane.setMinimumSize(new Dimension(300, 500));
+        textPanel.add(scrollPane);
+
+        c.gridx = world.getBoardSizeX();
+        c.gridy = 0;
+        c.gridheight = world.getBoardSizeY();
+        c.weightx = 1.0;
+        c.anchor = GridBagConstraints.CENTER;
+        c.insets = new Insets(20, 0, 20, 0); // Dodatkowa przestrzeń na górze i na dole
+        boardPanel.add(textPanel, c);
+
+        textArea.setText("Welcome to the game!\n");
+
+        frame.addKeyListener(guiKeyListener);
+        frame.setContentPane(boardPanel);
+        frame.revalidate();
+        frame.repaint();
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setVisible(true);
+        TurnPerfomer turnPerfomer = new TurnPerfomer(world, this, boardPanel, frame, cellPanels, textArea);
+        turnPerfomer.execute();
     }
 
 
+    public void refreshBoard() {
+        frame.getContentPane().removeAll();
+        frame.repaint();
+        for (int y = 0; y < world.getBoardSizeY(); y++) {
+            for (int x = 0; x < world.getBoardSizeX(); x++) {
+                JPanel cellPanel = cellPanels[y][x];
 
+                if (world.getOrganism(x, y) != null) {
+                    ImageIcon icon = new ImageIcon(world.getOrganism(x, y).getImagePath());
+                    Image image = icon.getImage();
+                    Image newImage = image.getScaledInstance(cell_size, cell_size, Image.SCALE_SMOOTH);
+                    icon = new ImageIcon(newImage);
+                    JLabel label = new JLabel(icon);
+                    cellPanel.removeAll();
+                    cellPanel.add(label);
+                    cellPanel.revalidate();
+                    cellPanel.repaint();
+                } else {
+                    cellPanel.setBackground(Color.WHITE);
+                }
+            }
+        }
+        frame.setContentPane(boardPanel);
+        frame.revalidate();
+        frame.repaint();
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setVisible(true);
+    }
 
 
     private void loadGameMenu() {
+        // stwórz okno z wyborem pliku do wczytania
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+        fileChooser.setDialogTitle("Choose file to load");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("World files", "world");
+        fileChooser.addChoosableFileFilter(filter);
+        int returnValue = fileChooser.showOpenDialog(null);
 
 
 
 
+
+    }
+
+    public int getCellSize() {
+        return cell_size;
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 }

@@ -6,7 +6,7 @@ public abstract class Organism {
     protected int initiative;
     protected int posX;
     protected int posY;
-    protected int age;
+    protected int age = 1;
     protected String name;
     protected char prefix;
     protected World currWorld;
@@ -71,6 +71,18 @@ public abstract class Organism {
 
     public String getImagePath() {
         return IconsPath.valueOf(name.toUpperCase()).getPath();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public char getPrefix() {
+        return prefix;
+    }
+
+    public String getOrganismInfo() {
+        return "[" + name + "] " + "Age: " + age;
     }
 
 

@@ -39,7 +39,7 @@ public abstract class Plant extends Organism{
 
             Plant kid = this.clone(newPos[0], newPos[1]);
             currWorld.addOrganism(kid);
-            // infostream
+            currWorld.addToInfoStream(kid.getOrganismInfo() + " has multiplied on (" + newPos[0] + ", " + newPos[1] + ")\n");
 
         }
 

@@ -11,7 +11,6 @@ public abstract class Animal extends Organism {
     @Override
     public void action() {
         int[] newPos = {posX, posY};
-        // dodac infostreama
 
         this.makeMove(newPos);
 
@@ -33,11 +32,11 @@ public abstract class Animal extends Organism {
            }
 
            if(defender.hasBlocked(this)) {
-               //dodac info streama
+               currWorld.addToInfoStream(defender.getOrganismInfo() + " blocked and killed " + this.getOrganismInfo() + "\n");
                currWorld.removeOrganism(this);
            }
            else{
-               //dodac infostreama
+               currWorld.addToInfoStream(this.getOrganismInfo() + " killed " + defender.getOrganismInfo() + " and moved to (" + newPos[0] + ", " + newPos[1] + ") \n");
                currWorld.removeOrganism(currWorld.getOrganism(newPos[0], newPos[1]));
                this.setNewPosition(newPos[0], newPos[1]);
            }
@@ -45,7 +44,7 @@ public abstract class Animal extends Organism {
 
         }
         else {
-            //dodac infostreama
+            currWorld.addToInfoStream(this.getOrganismInfo() + " moved to (" + newPos[0] + ", " + newPos[1] + ") \n");
             this.setNewPosition(newPos[0], newPos[1]);
         }
     }
@@ -72,17 +71,15 @@ public abstract class Animal extends Organism {
             } while( currWorld.getOrganism(newPos[0], newPos[1]) != null && tryCounter < 40);
 
             if(tryCounter >= 40) {
-                return false;
+                return true;
             }
 
             Animal kid = this.clone(newPos[0], newPos[1]);
             currWorld.addOrganism(kid);
-            // infostream
+            currWorld.addToInfoStream(kid.getOrganismInfo() + " was born on (" + newPos[0] + ", " + newPos[1] + ") \n");
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
     }
 
     @Override

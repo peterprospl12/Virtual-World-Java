@@ -6,14 +6,18 @@ import Organisms.Plants.Grass;
 import Organisms.Plants.Guarana;
 import Organisms.Plants.PineBorscht;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Vector;
 public class World {
     private Organism[][] board;
+    private GUI gui;
     private int boardSizeX;
     private int boardSizeY;
     private Vector<Organism> organisms;
     private boolean humanAlive;
     private boolean gameSaved;
+    private StringBuilder infoStream;
 
     World(int boardSizeX, int boardSizeY) {
         this.boardSizeX = boardSizeX;
@@ -22,7 +26,8 @@ public class World {
         this.organisms = new Vector<Organism>();
         this.humanAlive = false;
         this.gameSaved = false;
-        this.createWindow();
+        this.infoStream = new StringBuilder();
+        this.gui = new GUI(this);
     }
     private void sortOrganisms() {
         int size = organisms.size();
@@ -41,21 +46,18 @@ public class World {
         }
     }
 
-    private void createWindow() {
-        GUI gui = new GUI(this);
-    }
+
 
     public void changeBoardSize() {
         this.board = new Organism[boardSizeY][boardSizeX];
     }
 
-    public boolean performTurn() {
-
-
+    public void performTurn() {
 
         this.drawWorld();
 
-        if (humanAlive) {
+
+
             this.sortOrganisms();
             for (int i = 0; i < organisms.size(); i++) {
                 if (!humanAlive)
@@ -79,9 +81,7 @@ public class World {
             }
             gameSaved = false;
             this.drawWorld();
-            return true;
-        }
-        return false;
+
 
     }
 
@@ -131,6 +131,40 @@ public class World {
         }
     }
 
+    public void saveWorld(String filename) {
+
+        filename = filename + ".txt";
+
+        try {
+            FileWriter saveFile = new FileWriter(filename);
+            saveFile.write(boardSizeX + " " + boardSizeY + "\n");
+
+            int size = organisms.size();
+
+            for (Organism organism : organisms) {
+                saveFile.write(organism.getPrefix() + " ");
+                if (organism instanceof Human) {
+                    Human human = (Human) organism;
+                    //saveFile.write(human.getCooldown() + " " + human.getSkillUsed() + " ");
+                }
+                saveFile.write(organism.getStrength() + " " + organism.getPosX() + " " +
+                        organism.getPosY() + " " + organism.getAge() + "\n");
+            }
+
+            saveFile.close();
+            drawWorld();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public void loadWorld(String filename) {
+
+    }
+
+
     public int getBoardSizeX() {
         return boardSizeX;
     }
@@ -157,6 +191,30 @@ public class World {
     public void clearOrganisms() {
         this.organisms.clear();
     }
+
+    public boolean isHumanAlive() {
+        return humanAlive;
+    }
+
+    public GUI getGui() {
+        return gui;
+    }
+
+
+    public void addToInfoStream(String info) {
+        infoStream.append(info);
+    }
+
+    public void clearInfoStream() {
+        infoStream = new StringBuilder();
+    }
+
+    public StringBuilder getInfoStream() {
+        return infoStream;
+    }
+
+
+
     public static <T> void swap(Vector<T> vector, int index1, int index2) {
         T tmp = vector.get(index1);
         vector.set(index1, vector.get(index2));

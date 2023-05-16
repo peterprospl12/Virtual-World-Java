@@ -5,12 +5,12 @@ import main.World;
 public class Wolfberries extends Plant{
 
     public Wolfberries(int posX, int posY, World currWorld) {
-        super(99, PLANT_INITIATIVE, posX, posY, 'W', "Wolfberries", currWorld);
+        super(99, PLANT_INITIATIVE, posX, posY, 'B', "Wolfberries", currWorld);
     }
 
     @Override
     public boolean collision(Organisms.Organism invader) {
-        //infostream
+        currWorld.addToInfoStream(invader.getOrganismInfo() + " has eaten " + this.getOrganismInfo() + " and died\n");
         currWorld.removeOrganism(invader);
         return true;
     }

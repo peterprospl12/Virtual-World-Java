@@ -11,6 +11,7 @@ public class Guarana extends Plant{
     @Override
     public boolean collision(Organism invader) {
         invader.setStrength(invader.getStrength() + 3);
+        currWorld.addToInfoStream(invader.getOrganismInfo() + " has eaten " + this.getOrganismInfo() + " and gained 3 strength points\n");
         return false;
 
     }

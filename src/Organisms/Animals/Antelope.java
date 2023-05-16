@@ -82,6 +82,9 @@ public class Antelope extends Animal {
 
             this.setNewPosition(newPos[0], newPos[1]);
             attacker.setNewPosition(oldX, oldY);
+
+            currWorld.addToInfoStream(this.getName() + " escaped from " + attacker.getName() + " to " + this.getPosX() + " " + this.getPosY() + "\n");
+
             return true;
 
         }

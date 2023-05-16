@@ -25,6 +25,7 @@ public class PineBorscht extends Plant {
                 Organism orgToKill = currWorld.getOrganism(posToKillX, posToKillY);
 
                 if (orgToKill instanceof Animal) {
+                    currWorld.addToInfoStream(this.getOrganismInfo() + " has killed " + orgToKill.getOrganismInfo() + " on (" + posToKillX + ", " + posToKillY + ")\n");
                     currWorld.removeOrganism(currWorld.getOrganism(posToKillX, posToKillY));
                 }
             }
@@ -35,7 +36,7 @@ public class PineBorscht extends Plant {
 
     @Override
     public boolean collision(Organism invader) {
-        //infostream
+        currWorld.addToInfoStream(invader.getOrganismInfo() + " has eaten " + this.getOrganismInfo() + " and died\n");
         currWorld.removeOrganism(invader);
         return true;
 
