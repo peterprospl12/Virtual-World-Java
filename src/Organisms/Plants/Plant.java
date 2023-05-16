@@ -20,7 +20,6 @@ public abstract class Plant extends Organism{
     @Override
     public void action() {
         Random rand = new Random();
-        int[][] moves = { {0,-1}, {0,1}, {-1,0}, {1,0}, {-1,-1}, {1,-1}, {-1,1}, {1,1} };
         int rand_number = rand.nextInt(8);
 
         if(rand_number == 2) {

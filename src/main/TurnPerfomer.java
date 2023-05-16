@@ -9,19 +9,16 @@ import java.util.List;
 
 
 public class TurnPerfomer extends SwingWorker<Void, Void> {
-    private World currWorld;
-    private GUI gui;
-    private JPanel boardPanel;
-    private JFrame frame;
-    private JPanel[][] cellPanels;
-    private HashMap <String, ImageIcon> icons = new HashMap<>();
-    private JTextPane textArea;
+    private final World currWorld;
+    private final GUI gui;
 
-    public TurnPerfomer(World currWorld, GUI gui, JPanel boardPanel, JFrame frame, JPanel[][] cellPanels, JTextPane textArea) {
+    private final JPanel[][] cellPanels;
+    private final HashMap <String, ImageIcon> icons = new HashMap<>();
+    private final JTextPane textArea;
+
+    public TurnPerfomer(World currWorld, GUI gui, JPanel[][] cellPanels, JTextPane textArea) {
         this.currWorld = currWorld;
         this.gui = gui;
-        this.boardPanel = boardPanel;
-        this.frame = frame;
         this.cellPanels = cellPanels;
         this.textArea = textArea;
     }
@@ -32,6 +29,11 @@ public class TurnPerfomer extends SwingWorker<Void, Void> {
             currWorld.performTurn();
             publish();
 
+            if(!currWorld.isHumanAlive()) {
+                JOptionPane.showMessageDialog(null, "You lost!");
+                currWorld.getGui().getFrame().dispose();
+            }
+
             Thread.sleep(100); // Opóźnienie 100 milisekund
         }
         return null;
@@ -39,7 +41,6 @@ public class TurnPerfomer extends SwingWorker<Void, Void> {
 
     @Override
     protected void process(List<Void> chunks) {
-        // Odświeżenie planszy
 
         for (int y = 0; y < currWorld.getBoardSizeY(); y++) {
             for (int x = 0; x < currWorld.getBoardSizeX(); x++) {
@@ -68,17 +69,14 @@ public class TurnPerfomer extends SwingWorker<Void, Void> {
 
     public ImageIcon getIcon(Organism organism) {
         ImageIcon icon = icons.get(organism.getName());
-        if(icon != null) {
-            return icon;
-        }
-        else {
+        if (icon == null) {
             icon = new ImageIcon(organism.getImagePath());
             Image image = icon.getImage();
             Image newImage = image.getScaledInstance(gui.getCellSize(), gui.getCellSize(), Image.SCALE_SMOOTH);
             icon = new ImageIcon(newImage);
             icons.put(organism.getName(), icon);
-            return icon;
         }
+        return icon;
     }
 
 }

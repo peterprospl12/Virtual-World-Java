@@ -30,7 +30,7 @@ public class Antelope extends Animal {
 
         while(tryCounter < 40) {
             tryCounter++;
-            int rand_number = rand.nextInt(4);
+            int rand_number = rand.nextInt(16);
 
             int dx = moves[rand_number][0];
             int dy = moves[rand_number][1];

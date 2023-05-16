@@ -1,20 +1,17 @@
 package main;
 import Organisms.Animals.*;
 import Organisms.Organism;
-import Organisms.Plants.Dandelion;
-import Organisms.Plants.Grass;
-import Organisms.Plants.Guarana;
-import Organisms.Plants.PineBorscht;
+import Organisms.Plants.*;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.Objects;
 import java.util.Vector;
 public class World {
     private Organism[][] board;
-    private GUI gui;
+    private final GUI gui;
     private int boardSizeX;
     private int boardSizeY;
-    private Vector<Organism> organisms;
+    private final Vector<Organism> organisms;
     private boolean humanAlive;
     private boolean gameSaved;
     private StringBuilder infoStream;
@@ -52,7 +49,7 @@ public class World {
         this.board = new Organism[boardSizeY][boardSizeX];
     }
 
-    public void performTurn() {
+    public void performTurn() throws IOException {
 
         this.drawWorld();
 
@@ -133,19 +130,18 @@ public class World {
 
     public void saveWorld(String filename) {
 
-        filename = filename + ".txt";
+        filename = filename + ".world";
 
         try {
             FileWriter saveFile = new FileWriter(filename);
             saveFile.write(boardSizeX + " " + boardSizeY + "\n");
 
-            int size = organisms.size();
 
             for (Organism organism : organisms) {
                 saveFile.write(organism.getPrefix() + " ");
                 if (organism instanceof Human) {
                     Human human = (Human) organism;
-                    //saveFile.write(human.getCooldown() + " " + human.getSkillUsed() + " ");
+                    saveFile.write(human.getCooldown() + " " + human.getSkillUsed() + " ");
                 }
                 saveFile.write(organism.getStrength() + " " + organism.getPosX() + " " +
                         organism.getPosY() + " " + organism.getAge() + "\n");
@@ -160,7 +156,111 @@ public class World {
 
     }
 
-    public void loadWorld(String filename) {
+    public void loadWorld(File file) throws IOException {
+        try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line = reader.readLine();
+            String[] size = line.split(" ");
+            boardSizeX = Integer.parseInt(size[0]);
+            boardSizeY = Integer.parseInt(size[1]);
+            this.board = new Organism[boardSizeY][boardSizeX];
+            organisms.clear();
+
+            int strength;
+            int posX;
+            int posY;
+            int age;
+            int cooldown = 0;
+            boolean skillUsed = false;
+            int counter = 0;
+
+            while ((line = reader.readLine()) != null) {
+                String[] organism = line.split(" ");
+                if(Objects.equals(organism[counter++], "H")) {
+                    cooldown = Integer.parseInt(organism[counter++]);
+                    skillUsed = Boolean.parseBoolean(organism[counter++]);
+
+                }
+                strength = Integer.parseInt(organism[counter++]);
+                posX = Integer.parseInt(organism[counter++]);
+                posY = Integer.parseInt(organism[counter++]);
+                age = Integer.parseInt(organism[counter]);
+                counter = 0;
+                switch (organism[0]) {
+                    case "H" -> {
+                        Human human = new Human(posX, posY, this);
+                        human.setCooldown(cooldown);
+                        human.setSkillUsed(skillUsed);
+                        human.setAge(age);
+                        human.setStrength(strength);
+                        this.addOrganism(human);
+                    }
+                    case "A" -> {
+                        Antelope antelope = new Antelope(posX, posY, this);
+                        antelope.setStrength(strength);
+                        antelope.setAge(age);
+                        this.addOrganism(antelope);
+                    }
+                    case "F" -> {
+                        Fox fox = new Fox(posX, posY, this);
+                        fox.setStrength(strength);
+                        fox.setAge(age);
+                        this.addOrganism(fox);
+                    }
+                    case "S" -> {
+                        Sheep sheep = new Sheep(posX, posY, this);
+                        sheep.setStrength(strength);
+                        sheep.setAge(age);
+                        this.addOrganism(sheep);
+                    }
+                    case "T" -> {
+                        Turtle turtle = new Turtle(posX, posY, this);
+                        turtle.setStrength(strength);
+                        turtle.setAge(age);
+                        this.addOrganism(turtle);
+                    }
+                    case "W" -> {
+                        Wolf wolf = new Wolf(posX, posY, this);
+                        wolf.setStrength(strength);
+                        wolf.setAge(age);
+                        this.addOrganism(wolf);
+                    }
+                    case "D" -> {
+                        Dandelion dandelion = new Dandelion(posX, posY, this);
+                        dandelion.setStrength(strength);
+                        dandelion.setAge(age);
+                        this.addOrganism(dandelion);
+                    }
+                    case "G" -> {
+                        Grass grass = new Grass(posX, posY, this);
+                        grass.setAge(age);
+                        this.addOrganism(grass);
+                    }
+                    case "U" -> {
+                        Guarana guarana = new Guarana(posX, posY, this);
+                        guarana.setAge(age);
+                        this.addOrganism(guarana);
+                    }
+                    case "P" -> {
+                        PineBorscht pineBorscht = new PineBorscht(posX, posY, this);
+                        pineBorscht.setAge(age);
+                        this.addOrganism(pineBorscht);
+                    }
+                    case "B" -> {
+                        Wolfberries wolfberries = new Wolfberries(posX, posY, this);
+                        wolfberries.setAge(age);
+                        this.addOrganism(wolfberries);
+                    }
+
+                }
+            }
+            this.gameSaved = true;
+            drawWorld();
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+        }
 
     }
 
@@ -219,6 +319,18 @@ public class World {
         T tmp = vector.get(index1);
         vector.set(index1, vector.get(index2));
         vector.set(index2, tmp);
+    }
+
+
+
+
+
+    public void setHumanAlive(boolean humanAlive) {
+        this.humanAlive = humanAlive;
+    }
+
+    public int getOrganismsSize() {
+        return organisms.size();
     }
 
 }

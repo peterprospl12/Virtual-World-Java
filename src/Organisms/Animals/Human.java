@@ -4,9 +4,8 @@ import Organisms.Organism;
 import main.GUIKeyListener;
 import main.World;
 
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Scanner;
+import java.io.IOException;
 
 public class Human extends Animal{
 
@@ -15,17 +14,13 @@ public class Human extends Animal{
     private int skillCD = 0;
     private boolean skillUsed = false;
 
-    private static final int LEFT_ARROW = 37;
-    private static final int RIGHT_ARROW = 39;
-    private static final int UP_ARROW = 38;
-    private static final int DOWN_ARROW = 40;
 
     public Human(int posX, int posY, World currWorld) {
         super(HUMAN_STRENGTH, HUMAN_INITIATIVE, posX, posY, 'H', "Human", currWorld);
     }
 
     @Override
-    public void makeMove(int[] newPos) {
+    public void makeMove(int[] newPos) throws IOException {
         final int[] newX = {newPos[0]};
         final int[] newY = {newPos[1]};
 
@@ -34,12 +29,13 @@ public class Human extends Animal{
         GUIKeyListener keyListener = new GUIKeyListener(currWorld.getGui().getFrame());
         currWorld.getGui().getFrame().addKeyListener(keyListener);
         currWorld.getGui().getFrame().requestFocus();
-        while (true) {
+        while (currWorld.isHumanAlive()) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
 
             int keyCode = keyListener.getKeyCode();
             if (keyCode == KeyEvent.VK_UP) {
@@ -69,6 +65,9 @@ public class Human extends Animal{
                     currWorld.addToInfoStream( this.getOrganismInfo() + " used his special skill! \n");
                     break;
                 }
+            } else if (keyCode == KeyEvent.VK_ESCAPE) {
+                currWorld.getGui().loadGameMenu();
+                break;
             }
 
         }
@@ -126,15 +125,15 @@ public class Human extends Animal{
         return skillCD;
     }
 
-    boolean getSkillUsed() {
+    public boolean getSkillUsed() {
         return skillUsed;
     }
 
-    void setSkillUsed(boolean skillUsed) {
+    public void setSkillUsed(boolean skillUsed) {
         this.skillUsed = skillUsed;
     }
 
-    void setCooldown(int skillCD) {
+    public void setCooldown(int skillCD) {
         this.skillCD = skillCD;
     }
 
@@ -142,4 +141,6 @@ public class Human extends Animal{
     public Human clone(int clonePosX, int clonePosY) {
         return null;
     }
+
+
 }

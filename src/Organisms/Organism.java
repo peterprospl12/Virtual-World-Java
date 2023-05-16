@@ -1,5 +1,8 @@
 package Organisms;
 import main.World;
+
+import java.io.IOException;
+
 public abstract class Organism {
     public static final String images_path = "images/";
     protected int strength;
@@ -21,9 +24,9 @@ public abstract class Organism {
         this.currWorld = currWorld;
     }
 
-    public abstract void action();
+    public abstract void action() throws IOException;
     public abstract boolean collision(Organism invader);
-    public abstract void makeMove(int[] newPos);
+    public abstract void makeMove(int[] newPos) throws IOException;
 
     public boolean hasBlocked(Organism invader) {
         int invaderStrength = invader.strength;
@@ -93,4 +96,7 @@ public abstract class Organism {
         currWorld.setOrganism(this, this.posX, this.posY);
     }
 
+    public void setAge(int age) {
+        this.age = age;
+    }
 }

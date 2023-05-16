@@ -6,15 +6,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class CellPanelMouseListener implements MouseListener {
 
-    private JPanel cellPanel;
-    private World world;
-    private int[] numberOfOrganism;
-    private int x;
-    private int y;
+    private final JPanel cellPanel;
+    private final World world;
+    private final int[] numberOfOrganism;
+    private final int x;
+    private final int y;
+
 
     public CellPanelMouseListener(JPanel cellPanel, int x, int y, int[] numberOfOrganism, World world) {
         this.cellPanel = cellPanel;
@@ -28,6 +28,10 @@ public class CellPanelMouseListener implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent e) {
         if(world.getOrganism(x,y) == null) {
+            if(world.isHumanAlive() && numberOfOrganism[0] == 10){
+                JOptionPane.showMessageDialog(null, "You can't create more than one human!");
+                return;
+            }
             OrganismFactory organismFactory = new OrganismFactory();
             organismFactory.organismsList(x, y, numberOfOrganism[0], world);
 
@@ -39,17 +43,18 @@ public class CellPanelMouseListener implements MouseListener {
 
             cellPanel.removeAll();
             cellPanel.add(label);
-            cellPanel.revalidate();
-            cellPanel.repaint();
 
         }
         else {
+            if (world.getOrganism(x, y).getName().equals("Human")) {
+                world.setHumanAlive(false);
+            }
             world.removeOrganism(world.getOrganism(x,y));
             cellPanel.removeAll();
             cellPanel.setBackground(Color.WHITE);
-            cellPanel.revalidate();
-            cellPanel.repaint();
         }
+        cellPanel.revalidate();
+        cellPanel.repaint();
         world.drawWorld();
     }
 

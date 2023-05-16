@@ -2,6 +2,8 @@ package Organisms.Animals;
 
 import Organisms.Organism;
 import main.World;
+
+import java.io.IOException;
 import java.util.Random;
 public abstract class Animal extends Organism {
 
@@ -9,7 +11,7 @@ public abstract class Animal extends Organism {
         super(strength, initiative, posX, posY, prefix, name, currWorld);
     }
     @Override
-    public void action() {
+    public void action() throws IOException {
         int[] newPos = {posX, posY};
 
         this.makeMove(newPos);
@@ -49,13 +51,13 @@ public abstract class Animal extends Organism {
         }
     }
 
-    public boolean checkMultiply(Animal defender){
+    public boolean checkMultiply(Animal defender) throws IOException {
         if(defender == null) {
             return false;
         }
 
         if(this.getClass().equals(defender.getClass())){
-            int[] newPos = {posX, posY};
+            int[] newPos = {0, 0};
             int tryCounter = 0;
             Random rand = new Random();
             do {
@@ -88,7 +90,7 @@ public abstract class Animal extends Organism {
     }
 
     @Override
-    public void makeMove(int[] newPos) {
+    public void makeMove(int[] newPos) throws IOException {
         int newX = posX;
         int newY = posY;
 

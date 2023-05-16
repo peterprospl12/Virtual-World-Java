@@ -3,6 +3,7 @@ package Organisms.Animals;
 import Organisms.Organism;
 import main.World;
 
+import java.io.IOException;
 import java.util.Random;
 
 public class Turtle extends Animal{
@@ -15,9 +16,7 @@ public class Turtle extends Animal{
     }
 
     @Override
-    public void makeMove(int[] newPos) {
-        int newX = newPos[0];
-        int newY = newPos[1];
+    public void makeMove(int[] newPos) throws IOException {
 
         Random rand = new Random();
         int rand_number = rand.nextInt(4);
